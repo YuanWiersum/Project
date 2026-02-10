@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wil jij mijn Valentijn zijn?</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff5f9e, #ff8fb1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: white;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 40px 25px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            max-width: 420px;
+            width: 90%;
+            animation: fadeIn 1.2s ease;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            min-height: 2.5em;
+        }
+
+        h2 {
+            font-weight: normal;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .buttons {
+            position: relative;
+            height: 100px;
+        }
+
+        button {
+            padding: 14px 28px;
+            font-size: 1em;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            position: absolute;
+        }
+
+        .yes {
+            background: white;
+            color: #ff4d88;
+            font-weight: bold;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .no {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            left: 60%;
+            top: 55px;
+        }
+
+        .result {
+            display: none;
+            font-size: 1.6em;
+            margin-top: 30px;
+            animation: pop 0.6s ease;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.7em; }
+            p { font-size: 1em; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="effects"></canvas>
+
+<div class="card">
+    <h1 id="name"></h1>
+    <h2>Ik heb een belangrijke vraag…</h2>
+    <p>Wil jij mijn Valentijn zijn? 💖</p>
+
+    <div class="buttons">
+        <button class="yes" onclick="yesClicked()">Ja 😍</button>
+        <button class="no" id="noBtn">Nee 🙈</button>
+    </div>
+
+    <div class="result" id="result">
+        YAY!!! 💕 Jij bent mijn Valentijn 💕
+    </div>
+</div>
+
+<script>
+    /* Typ animatie naam */
+    const nameText = "Renske Esmee Temmink";
+    const nameEl = document.getElementById("name");
+    let index = 0;
+
+    function typeName() {
+        if (index < nameText.length) {
+            nameEl.textContent += nameText.charAt(index);
+            index++;
+            setTimeout(typeName, 120);
+        }
+    }
+    typeName();
+
+    /* Rennend nee-knopje (steeds sneller) */
+    const noBtn = document.getElementById("noBtn");
+    let speed = 200;
+
+    function moveNo() {
+        speed = Math.max(50, speed - 15);
+        const x = Math.random() * 260 - 130;
+        const y = Math.random() * 120 - 60;
+        noBtn.style.transition = `transform ${speed}ms`;
+        noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    noBtn.addEventListener("mouseover", moveNo);
+    noBtn.addEventListener("touchstart", moveNo);
+
+    /* Confetti + vuurwerk */
+    const canvas = document.getElementById("effects");
+    const ctx = canvas.getContext("2d");
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    let particles = [];
+
+    function createFirework() {
+        for (let i = 0; i < 80; i++) {
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                life: 100,
+                color: `hsl(${Math.random() * 360},100%,60%)`
+            });
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, 4, 4);
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    function yesClicked() {
+        document.getElementById("result").style.display = "block";
+        for (let i = 0; i < 6; i++) {
+            setTimeout(createFirework, i * 400);
+        }
+    }
+
+    window.addEventListener("resize", () => {
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+    });
+</script>
+
+</body>
+</html>
